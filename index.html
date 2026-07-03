@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Shop</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-white text-gray-900">
+
+<!-- NAV -->
+<header class="fixed w-full bg-white/80 backdrop-blur border-b z-50">
+  <div class="max-w-6xl mx-auto flex justify-between items-center p-4">
+    <div class="font-bold text-xl">🟣 Shop</div>
+
+    <button onclick="openCart()" class="relative text-sm">
+      🛒 Cart
+      <span id="cartCount"
+        class="bg-purple-600 text-white text-xs px-2 py-1 rounded-full absolute -top-2 -right-3">
+        0
+      </span>
+    </button>
+  </div>
+</header>
+
+<!-- HERO (BANNER STYLE) -->
+<section class="pt-24">
+  <div class="max-w-6xl mx-auto px-6">
+
+    <img
+      src="https://placehold.co/1400x400/png?text=Shop+Banner"
+      class="w-full rounded-2xl shadow-lg"
+      alt="Banner"
+    />
+
+    <div class="text-center mt-6">
+      <h1 class="text-4xl font-bold">Build your modern online store</h1>
+      <p class="text-gray-600 mt-2">Fast, clean and conversion-focused shop template</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section id="products" class="max-w-6xl mx-auto px-6 py-20">
+
+  <h2 class="text-3xl font-bold text-center mb-10">Featured Products</h2>
+
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <!-- PRODUCT 1 -->
+    <div class="border rounded-2xl p-5 hover:shadow-lg transition cursor-pointer"
+         onclick="openDetail('Laptop Setup','Minimal workspace setup for productivity.',18999,'https://placehold.co/600x400/png?text=Laptop')">
+
+      <img src="https://placehold.co/600x400/png?text=Laptop"
+           class="rounded-xl mb-4"/>
+
+      <h3 class="font-semibold">Laptop Setup</h3>
+
+      <div class="mt-3 flex justify-between items-center">
+        <span class="font-bold text-purple-600">฿18,999</span>
+
+        <button onclick="event.stopPropagation(); addToCart('Laptop Setup', 18999)"
+          class="bg-purple-600 text-white px-3 py-1 rounded-lg text-sm">
+          Add
+        </button>
+      </div>
+    </div>
+
+    <!-- PRODUCT 2 -->
+    <div class="border rounded-2xl p-5 hover:shadow-lg transition cursor-pointer"
+         onclick="openDetail('Headphones','Noise cancelling premium audio.',1299,'https://placehold.co/600x400/png?text=Headphones')">
+
+      <img src="https://placehold.co/600x400/png?text=Headphones"
+           class="rounded-xl mb-4"/>
+
+      <h3 class="font-semibold">Headphones</h3>
+
+      <div class="mt-3 flex justify-between items-center">
+        <span class="font-bold text-purple-600">฿1,299</span>
+
+        <button onclick="event.stopPropagation(); addToCart('Headphones', 1299)"
+          class="bg-purple-600 text-white px-3 py-1 rounded-lg text-sm">
+          Add
+        </button>
+      </div>
+    </div>
+
+    <!-- PRODUCT 3 -->
+    <div class="border rounded-2xl p-5 hover:shadow-lg transition cursor-pointer"
+         onclick="openDetail('Smart Watch','Health tracking & notifications.',2499,'https://placehold.co/600x400/png?text=Smartwatch')">
+
+      <img src="https://placehold.co/600x400/png?text=Smartwatch"
+           class="rounded-xl mb-4"/>
+
+      <h3 class="font-semibold">Smart Watch</h3>
+
+      <div class="mt-3 flex justify-between items-center">
+        <span class="font-bold text-purple-600">฿2,499</span>
+
+        <button onclick="event.stopPropagation(); addToCart('Smart Watch', 2499)"
+          class="bg-purple-600 text-white px-3 py-1 rounded-lg text-sm">
+          Add
+        </button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CART -->
+<div id="cartPanel"
+ class="fixed top-0 right-0 w-80 h-full bg-white shadow-xl transform translate-x-full transition z-50 p-5">
+
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-bold">Your Cart</h2>
+    <button onclick="closeCart()">✖</button>
+  </div>
+
+  <div id="cartItems" class="space-y-3 text-sm"></div>
+
+  <div class="mt-5 border-t pt-4">
+    <p class="font-bold">Total: ฿<span id="total">0</span></p>
+
+    <button onclick="checkout()"
+      class="bg-green-600 text-white w-full py-2 rounded-lg mt-3">
+      Checkout
+    </button>
+  </div>
+</div>
+
+<!-- OVERLAY -->
+<div id="overlay"
+ class="fixed inset-0 bg-black/40 hidden"
+ onclick="closeCart()"></div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div id="detailModal"
+ class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+
+  <div class="bg-white w-96 rounded-xl p-5 relative">
+
+    <button onclick="closeDetail()" class="absolute top-2 right-3 text-xl">✖</button>
+
+    <img id="detailImg" class="rounded-lg mb-4"/>
+
+    <h2 id="detailName" class="text-xl font-bold"></h2>
+    <p id="detailDesc" class="text-gray-600 mt-2"></p>
+
+    <div class="mt-3 font-bold text-purple-600">
+      ฿<span id="detailPrice"></span>
+    </div>
+
+    <button id="detailAdd"
+      class="mt-4 bg-purple-600 text-white w-full py-2 rounded-lg">
+      Add to Cart
+    </button>
+
+  </div>
+</div>
+
+<script>
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let current = null;
+
+function save(){
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+/* ADD */
+function addToCart(name, price){
+  cart.push({name, price});
+  save();
+  updateCart();
+  openCart();
+}
+
+/* REMOVE / UPDATE */
+function updateCart(){
+
+  document.getElementById("cartCount").innerText = cart.length;
+
+  let html = "";
+  let total = 0;
+
+  cart.forEach((item, i) => {
+    total += item.price;
+
+    html += `
+      <div class="flex justify-between items-center border-b pb-2">
+        <div>
+          <div>${item.name}</div>
+          <div class="text-xs text-gray-500">฿${item.price}</div>
+        </div>
+
+        <button onclick="removeItem(${i})"
+          class="text-red-500 text-xs border px-2 py-1 rounded">
+          Remove
+        </button>
+      </div>
+    `;
+  });
+
+  document.getElementById("cartItems").innerHTML = html;
+  document.getElementById("total").innerText = total;
+}
+
+function removeItem(i){
+  cart.splice(i,1);
+  save();
+  updateCart();
+}
+
+/* CART */
+function openCart(){
+  document.getElementById("cartPanel").classList.remove("translate-x-full");
+  document.getElementById("overlay").classList.remove("hidden");
+}
+
+function closeCart(){
+  document.getElementById("cartPanel").classList.add("translate-x-full");
+  document.getElementById("overlay").classList.add("hidden");
+}
+
+/* DETAIL */
+function openDetail(name, desc, price, img){
+
+  current = {name, price};
+
+  document.getElementById("detailName").innerText = name;
+  document.getElementById("detailDesc").innerText = desc;
+  document.getElementById("detailPrice").innerText = Number(price).toLocaleString("en-US");
+  document.getElementById("detailImg").src = img;
+
+  document.getElementById("detailModal").classList.remove("hidden");
+}
+
+function closeDetail(){
+  document.getElementById("detailModal").classList.add("hidden");
+}
+
+/* ADD FROM DETAIL */
+document.getElementById("detailAdd").onclick = function(){
+  if(current){
+    addToCart(current.name, current.price);
+    closeDetail();
+  }
+}
+
+/* CHECKOUT */
+function checkout(){
+  alert("Checkout demo");
+
+  cart = [];
+  save();
+  updateCart();
+  closeCart();
+}
+
+updateCart();
+
+</script>
+
+</body>
+</html>
